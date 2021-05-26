@@ -1,9 +1,9 @@
-import 'org.ssssssss.magicapi.adapter.Resource' as root;
-import 'org.ssssssss.magicapi.provider.GroupServiceProvider';
-import 'org.ssssssss.magicapi.provider.ApiServiceProvider';
-import 'org.ssssssss.magicapi.provider.FunctionServiceProvider';
-import 'org.ssssssss.magicapi.utils.IoUtils' as IoUtils
-import 'org.ssssssss.magicapi.utils.JsonUtils' as JsonUtils
+import 'Resource' as root;
+import 'GroupServiceProvider';
+import 'ApiServiceProvider';
+import 'FunctionServiceProvider';
+import 'IoUtils' as IoUtils
+import 'JsonUtils' as JsonUtils
 import 'java.io.File' as File;
 var ds = db.camel();    //如果之前保存在其他库，这里可以修改为db.xxx.camel();
 var apiSql = """ select * from magic_api_info """;
