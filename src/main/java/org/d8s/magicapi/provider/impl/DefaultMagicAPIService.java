@@ -16,6 +16,7 @@ import org.d8s.script.parsing.ast.Expression;
 
 import javax.script.ScriptContext;
 import javax.script.SimpleScriptContext;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultMagicAPIService implements MagicAPIService {
@@ -40,7 +41,7 @@ public class DefaultMagicAPIService implements MagicAPIService {
 					return new Expression(new Span("unknown source")) {
 						@Override
 						public Object evaluate(MagicScriptContext context, Scope scope) {
-							return execute(info, scope.getVariables());
+							return doExecute(info, scope.getVariables());
 						}
 					};
 				}
@@ -49,7 +50,7 @@ public class DefaultMagicAPIService implements MagicAPIService {
 		});
 	}
 
-	private Object execute(ApiInfo info, Map<String, Object> context) {
+	private Object doExecute(ApiInfo info, Map<String, Object> context) {
 
 		// 获取原上下文
 		final MagicScriptContext magicScriptContext = MagicScriptContext.get();
@@ -74,16 +75,39 @@ public class DefaultMagicAPIService implements MagicAPIService {
 		if (info == null) {
 			throw new MagicServiceException(String.format("找不到对应接口 [%s:%s]", method, path));
 		}
-		return execute(info, context);
+		return doExecute(info, context);
 	}
 
+	@Override
+	public Object execute(String  url) {
+		ApiInfo info = this.mappingHandlerMapping.getApiInfo("method", url);
+		if (info == null) {
+			throw new MagicServiceException(String.format("找不到对应接口 [%s]", url));
+		}
+		return doExecute(info,new HashMap<>(1));
+	}
 	@Override
 	public Object call(String method, String path, Map<String, Object> context) {
 		RequestEntity requestEntity = RequestEntity.empty();
 		try {
 			return resultProvider.buildResult(requestEntity, execute(method, path, context));
 		} catch (MagicServiceException e) {
-			return null;    //找不到对应接口
+			return null;
+		} catch (Throwable root) {
+			if (throwException) {
+				throw root;
+			}
+			return resultProvider.buildResult(requestEntity, root);
+		}
+	}
+
+	@Override
+	public Object call(String url) {
+		RequestEntity requestEntity = RequestEntity.empty();
+		try {
+			return resultProvider.buildResult(requestEntity, execute(url));
+		} catch (MagicServiceException e) {
+			return null;
 		} catch (Throwable root) {
 			if (throwException) {
 				throw root;

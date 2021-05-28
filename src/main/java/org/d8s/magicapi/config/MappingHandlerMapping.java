@@ -112,7 +112,8 @@ public class MappingHandlerMapping {
 		if (!StringUtils.isEmpty(requestMapping) && !requestMapping.startsWith("/")) {
 			requestMapping = "/" + requestMapping;
 		}
-		return Objects.toString(requestMethod, "GET").toUpperCase() + ":" + requestMapping;
+		String method = Objects.toString(requestMethod, "GET").toUpperCase() ;
+		return  "method"+":" + requestMapping;
 	}
 
 	public static Group findGroup(String groupId) {
